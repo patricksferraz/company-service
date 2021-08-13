@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package github.com.c_4u;
+
+option go_package = "/protofiles;pb";
+
+import "google/protobuf/timestamp.proto";
+
+message CreateCompanyRequest {
+    Company company = 1;
+}
+
+message CreateCompanyResponse {
+    string id = 1;
+}
+
+message FindCompanyRequest {
+    string id = 1;
+}
+
+message FindCompanyResponse {
+    Company company = 1;
+}
+
+message FilterCompanies {
+    string corporate_name = 1;
+    string trade_name = 2;
+    string cnpj = 3;
+    int64 page_size = 4;
+    string page_token = 5;
+}
+
+message SearchCompaniesRequest {
+    FilterCompanies filter = 1;
+}
+
+message SearchCompaniesResponse {
+    repeated Company companies = 1;
+    string next_page_token = 2;
+}
+
+message Company {
+    string id = 1;
+    string corporate_name = 2;
+    string trade_name = 3;
+    string cnpj = 4;
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp updated_at = 6;
+}
+
+message UpdateCompanyRequest {
+    string id = 1;
+    string corporate_name = 2;
+    string trade_name = 3;
+}
+
+message StatusResponse {
+    uint32 code = 1;
+    string message = 2;
+    string error = 3;
+}
+
+service CompanyService {
+    rpc CreateCompany (CreateCompanyRequest) returns (CreateCompanyResponse);
+    rpc FindCompany (FindCompanyRequest) returns (FindCompanyResponse);
+    rpc SearchCompanies (SearchCompaniesRequest) returns (SearchCompaniesResponse);
+    rpc UpdateCompany (UpdateCompanyRequest) returns (StatusResponse);
+}

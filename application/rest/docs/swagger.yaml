@@ -1,0 +1,231 @@
+basePath: /api/v1
+definitions:
+  rest.Company:
+    properties:
+      cnpj:
+        type: string
+      corporate_name:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      trade_name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  rest.CreateCompanyRequest:
+    properties:
+      cnpj:
+        type: string
+      corporate_name:
+        type: string
+      trade_name:
+        type: string
+    required:
+    - cnpj
+    - corporate_name
+    - trade_name
+    type: object
+  rest.CreateCompanyResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  rest.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      error:
+        example: status bad request
+        type: string
+    type: object
+  rest.HTTPResponse:
+    properties:
+      code:
+        example: 200
+        type: integer
+      message:
+        example: a message
+        type: string
+    type: object
+  rest.SearchCompaniesResponse:
+    properties:
+      companies:
+        items:
+          $ref: '#/definitions/rest.Company'
+        type: array
+      next_page_token:
+        type: string
+    type: object
+  rest.UpdateCompanyRequest:
+    properties:
+      corporate_name:
+        type: string
+      trade_name:
+        type: string
+    type: object
+info:
+  contact:
+    email: contato@coding4u.com.br
+    name: Coding4u
+  description: Swagger API for Golang Project Company.
+  termsOfService: http://swagger.io/terms/
+  title: Company Swagger API
+  version: "1.0"
+paths:
+  /companies:
+    get:
+      consumes:
+      - application/json
+      description: Search companies by `filter`. if the page size is empty, 10 will
+        be considered.
+      operationId: searchCompanies
+      parameters:
+      - in: query
+        name: cnpj
+        type: string
+      - in: query
+        name: corporate_name
+        type: string
+      - default: 10
+        in: query
+        name: page_size
+        type: integer
+      - in: query
+        name: page_token
+        type: string
+      - in: query
+        name: trade_name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/rest.SearchCompaniesResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: search companies by filter
+      tags:
+      - Company
+    post:
+      consumes:
+      - application/json
+      description: create company
+      operationId: createCompany
+      parameters:
+      - description: JSON body to create a new company
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/rest.CreateCompanyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.CreateCompanyResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: create a company
+      tags:
+      - Company
+  /companies/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Router for find a company
+      operationId: findCompany
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Company'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: find a company
+      tags:
+      - Company
+    put:
+      consumes:
+      - application/json
+      description: Router for update a company
+      operationId: updateCompany
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: JSON body to update a new company
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/rest.UpdateCompanyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: update a Company
+      tags:
+      - Company
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
