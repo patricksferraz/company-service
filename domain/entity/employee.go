@@ -12,15 +12,11 @@ func init() {
 
 type Employee struct {
 	Base      `json:",inline" valid:"required"`
-	CompanyID string   `json:"company_id" gorm:"column:company_id;type:uuid;not null" valid:"uuid"`
-	Company   *Company `json:"-" valid:"-"`
+	Companies []*Company `json:"-" gorm:"many2many:companies_employess;" valid:"-"`
 }
 
-func NewEmployee(id string, company *Company) (*Employee, error) {
-	employee := &Employee{
-		CompanyID: company.ID,
-		Company:   company,
-	}
+func NewEmployee(id string) (*Employee, error) {
+	employee := &Employee{}
 	employee.ID = id
 	employee.CreatedAt = time.Now()
 
@@ -33,5 +29,11 @@ func NewEmployee(id string, company *Company) (*Employee, error) {
 
 func (e *Employee) isValid() error {
 	_, err := govalidator.ValidateStruct(e)
+	return err
+}
+
+func (e *Employee) AddCompany(company *Company) error {
+	e.Companies = append(e.Companies, company)
+	err := e.isValid()
 	return err
 }

@@ -202,3 +202,46 @@ func (s *RestService) UpdateCompany(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, HTTPResponse{Code: http.StatusOK, Message: "updated successfully"})
 }
+
+// AddEmployeeToCompany godoc
+// @Security ApiKeyAuth
+// @Summary add employee to company
+// @Description Router for add employee to company
+// @ID addEmployeeToCompany
+// @Tags Company
+// @Accept json
+// @Produce json
+// @Param company_id path string true "Company ID"
+// @Param employee_id path string true "Employee ID"
+// @Success 200 {object} HTTPResponse
+// @Failure 400 {object} HTTPError
+// @Failure 403 {object} HTTPError
+// @Router /companies/{company_id}/employee/{employee_id} [post]
+func (s *RestService) AddEmployeeToCompany(ctx *gin.Context) {
+	var req AddEmployeeToCompanyRequest
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(
+			http.StatusBadRequest,
+			HTTPError{
+				Code:  http.StatusBadRequest,
+				Error: err.Error(),
+			},
+		)
+		return
+	}
+
+	err := s.Service.AddEmployeeToCompany(ctx, req.CompanyID, req.EmployeeID)
+	if err != nil {
+		ctx.JSON(
+			http.StatusForbidden,
+			HTTPError{
+				Code:  http.StatusForbidden,
+				Error: err.Error(),
+			},
+		)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, HTTPResponse{Code: http.StatusOK, Message: "added successfully"})
+}

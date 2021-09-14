@@ -60,3 +60,8 @@ type UpdateCompanyRequest struct {
 	CorporateName string `json:"corporate_name"`
 	TradeName     string `json:"trade_name"`
 }
+
+type AddEmployeeToCompanyRequest struct {
+	EmployeeID string `uri:"employee_id" binding:"required,uuid"`
+	CompanyID  string `uri:"company_id" binding:"required,uuid"`
+}

@@ -24,7 +24,7 @@ type Company struct {
 	TradeName     string      `json:"trade_name,omitempty" gorm:"column:trade_name;type:varchar(255);not null" valid:"required"`
 	Cnpj          string      `json:"cnpj,omitempty" gorm:"column:cnpj;type:varchar(25);not null;unique" valid:"cnpj"`
 	Token         *string     `json:"-" gorm:"column:token;type:varchar(25);not null" valid:"-"`
-	Employees     []*Employee `json:"employees,omitempty" gorm:"ForeignKey:CompanyID" valid:"-"`
+	Employees     []*Employee `json:"employees,omitempty" gorm:"many2many:companies_employess;References:id" valid:"-"`
 }
 
 func NewCompany(corporateName, tradeName, cnpj string) (*Company, error) {

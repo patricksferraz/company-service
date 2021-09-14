@@ -154,6 +154,43 @@ paths:
       summary: create a company
       tags:
       - Company
+  /companies/{company_id}/employee/{employee_id}:
+    post:
+      consumes:
+      - application/json
+      description: Router for add employee to company
+      operationId: addEmployeeToCompany
+      parameters:
+      - description: Company ID
+        in: path
+        name: company_id
+        required: true
+        type: string
+      - description: Employee ID
+        in: path
+        name: employee_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: add employee to company
+      tags:
+      - Company
   /companies/{id}:
     get:
       consumes:
