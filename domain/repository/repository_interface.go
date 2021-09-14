@@ -15,4 +15,6 @@ type RepositoryInterface interface {
 	PublishEvent(ctx context.Context, msg, topic, key string) error
 
 	CreateEmployee(ctx context.Context, employee *entity.Employee) error
+	FindEmployee(ctx context.Context, id string) (*entity.Employee, error)
+	SaveEmployee(ctx context.Context, employee *entity.Employee) error
 }

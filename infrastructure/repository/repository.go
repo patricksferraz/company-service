@@ -92,3 +92,19 @@ func (r *Repository) CreateEmployee(ctx context.Context, company *entity.Employe
 	err := r.P.Db.Create(company).Error
 	return err
 }
+
+func (r *Repository) FindEmployee(ctx context.Context, id string) (*entity.Employee, error) {
+	var employee entity.Employee
+	r.P.Db.First(&employee, "id = ?", id)
+
+	if employee.ID == "" {
+		return nil, fmt.Errorf("no employee found")
+	}
+
+	return &employee, nil
+}
+
+func (r *Repository) SaveEmployee(ctx context.Context, employee *entity.Employee) error {
+	err := r.P.Db.Save(employee).Error
+	return err
+}

@@ -9,8 +9,7 @@ func init() {
 }
 
 type Employee struct {
-	Base      `json:",inline" valid:"required"`
-	CompanyID string `json:"company_id,omitempty" valid:"uuid"`
+	Base `json:",inline" valid:"required"`
 }
 
 func NewEmployee() *Employee {

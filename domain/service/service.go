@@ -102,18 +102,52 @@ func (s *Service) UpdateCompany(ctx context.Context, id, corporateName, tradeNam
 	return nil
 }
 
-func (s *Service) CreateEmployee(ctx context.Context, id, companyID string) error {
-	company, err := s.Repository.FindCompany(ctx, companyID)
-	if err != nil {
-		return err
-	}
-
-	employee, err := entity.NewEmployee(id, company)
+func (s *Service) CreateEmployee(ctx context.Context, id string) error {
+	employee, err := entity.NewEmployee(id)
 	if err != nil {
 		return err
 	}
 
 	err = s.Repository.CreateEmployee(ctx, employee)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) AddEmployeeToCompany(ctx context.Context, companyID, employeeID string) error {
+	company, err := s.Repository.FindCompany(ctx, companyID)
+	if err != nil {
+		return err
+	}
+
+	employee, err := s.Repository.FindEmployee(ctx, employeeID)
+	if err != nil {
+		return err
+	}
+
+	err = employee.AddCompany(company)
+	if err != nil {
+		return err
+	}
+
+	err = s.Repository.SaveEmployee(ctx, employee)
+	if err != nil {
+		return err
+	}
+
+	event, err := entity.NewCompanyEmployeeEvent(company.ID, employee.ID)
+	if err != nil {
+		return err
+	}
+
+	msg, err := event.ToJson()
+	if err != nil {
+		return err
+	}
+
+	err = s.Repository.PublishEvent(ctx, string(msg), topic.ADD_EMPLOYEE_TO_COMPANY, company.ID)
 	if err != nil {
 		return err
 	}
