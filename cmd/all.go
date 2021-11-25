@@ -68,16 +68,21 @@ func NewAllCmd() *cobra.Command {
 			}
 			defer authConn.Close()
 
-			deliveryChan := make(chan ckafka.Event)
-			k, err := external.NewKafka(servers, groupId, []string{topic.NEW_EMPLOYEE}, deliveryChan)
+			kc, err := external.NewKafkaConsumer(servers, groupId, topic.CONSUMER_TOPICS)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("cannot start kafka consumer", err)
 			}
 
-			go k.DeliveryReport()
-			go kafka.StartKafkaProcessor(database, servers, groupId, k)
-			go rest.StartRestServer(database, authConn, k, restPort)
-			grpc.StartGrpcServer(database, authConn, k, grpcPort)
+			deliveryChan := make(chan ckafka.Event)
+			kp, err := external.NewKafkaProducer(servers, deliveryChan)
+			if err != nil {
+				log.Fatal("cannot start kafka producer", err)
+			}
+
+			go kp.DeliveryReport()
+			go kafka.StartKafkaServer(database, kc, kp)
+			go rest.StartRestServer(database, authConn, kp, restPort)
+			grpc.StartGrpcServer(database, authConn, kp, grpcPort)
 		},
 	}
 

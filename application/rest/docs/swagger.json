@@ -63,10 +63,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/rest.SearchCompaniesResponse"
-                            }
+                            "$ref": "#/definitions/rest.SearchCompaniesResponse"
                         }
                     },
                     "400": {
@@ -134,7 +131,114 @@
                 }
             }
         },
-        "/companies/{company_id}/employee/{employee_id}": {
+        "/companies/{company_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Router for find a company",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "find a company",
+                "operationId": "findCompany",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "company_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Company"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Router for update a company",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "update a Company",
+                "operationId": "updateCompany",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "company_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "JSON body to update a new company",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.UpdateCompanyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{company_id}/employees/{employee_id}": {
             "post": {
                 "security": [
                     {
@@ -191,14 +295,14 @@
                 }
             }
         },
-        "/companies/{id}": {
+        "/companies/{company_id}/work-scales": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Router for find a company",
+                "description": "Search work scales by `filter`.",
                 "consumes": [
                     "application/json"
                 ],
@@ -208,13 +312,132 @@
                 "tags": [
                     "Company"
                 ],
-                "summary": "find a company",
-                "operationId": "findCompany",
+                "summary": "search work scales by filter",
+                "operationId": "searchWorkScales",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Company ID",
-                        "name": "id",
+                        "name": "company_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.SearchWorkScalesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create work scale",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "create work scale",
+                "operationId": "createWorkScale",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "company_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "JSON body to create a new work scale",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.CreateWorkScaleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.CreateWorkScaleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{company_id}/work-scales/{work_scale_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Router for find a work scale",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "find a work scale",
+                "operationId": "findWorkScale",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "company_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Work Scale ID",
+                        "name": "work_scale_id",
                         "in": "path",
                         "required": true
                     }
@@ -223,7 +446,137 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest.Company"
+                            "$ref": "#/definitions/rest.WorkScale"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{company_id}/work-scales/{work_scale_id}/clocks": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add clock to work scale",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "add clock to work scale",
+                "operationId": "addClockToWorkScale",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "company_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Work Scale ID",
+                        "name": "work_scale_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "JSON body to add clock to work scale",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.AddClockToWorkScaleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.AddClockToWorkScaleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{company_id}/work-scales/{work_scale_id}/clocks/{clock_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Find clock",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "find clock",
+                "operationId": "findClock",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "company_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Work Scale ID",
+                        "name": "work_scale_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Clock ID",
+                        "name": "clock_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Clock"
                         }
                     },
                     "400": {
@@ -246,7 +599,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Router for update a company",
+                "description": "Router for update a clock",
                 "consumes": [
                     "application/json"
                 ],
@@ -256,24 +609,100 @@
                 "tags": [
                     "Company"
                 ],
-                "summary": "update a Company",
-                "operationId": "updateCompany",
+                "summary": "update a clock",
+                "operationId": "updateClock",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Company ID",
-                        "name": "id",
+                        "name": "company_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "JSON body to update a new company",
+                        "type": "string",
+                        "description": "Work Scale ID",
+                        "name": "work_scale_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Clock ID",
+                        "name": "clock_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "JSON body to update a clock",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest.UpdateCompanyRequest"
+                            "$ref": "#/definitions/rest.UpdateClockRequest"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Router for delete clock",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "delete clock",
+                "operationId": "deleteClock",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "company_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Work Scale ID",
+                        "name": "work_scale_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Clock ID",
+                        "name": "clock_id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -300,6 +729,59 @@
         }
     },
     "definitions": {
+        "rest.AddClockToWorkScaleRequest": {
+            "type": "object",
+            "required": [
+                "clock",
+                "timezone",
+                "type"
+            ],
+            "properties": {
+                "clock": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "rest.AddClockToWorkScaleResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.Clock": {
+            "type": "object",
+            "properties": {
+                "clock": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "work_scale_id": {
+                    "type": "string"
+                }
+            }
+        },
         "rest.Company": {
             "type": "object",
             "properties": {
@@ -350,6 +832,28 @@
                 }
             }
         },
+        "rest.CreateWorkScaleRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.CreateWorkScaleResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "rest.HTTPError": {
             "type": "object",
             "properties": {
@@ -390,6 +894,31 @@
                 }
             }
         },
+        "rest.SearchWorkScalesResponse": {
+            "type": "object",
+            "properties": {
+                "work_scales": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.WorkScale"
+                    }
+                }
+            }
+        },
+        "rest.UpdateClockRequest": {
+            "type": "object",
+            "properties": {
+                "clock": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
         "rest.UpdateCompanyRequest": {
             "type": "object",
             "properties": {
@@ -397,6 +926,35 @@
                     "type": "string"
                 },
                 "trade_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.WorkScale": {
+            "type": "object",
+            "properties": {
+                "clocks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.Clock"
+                    }
+                },
+                "company_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }

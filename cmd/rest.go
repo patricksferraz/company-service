@@ -62,15 +62,20 @@ func NewRestCmd() *cobra.Command {
 			}
 			defer authConn.Close()
 
-			deliveryChan := make(chan ckafka.Event)
-			k, err := external.NewKafka(servers, groupId, []string{topic.NEW_EMPLOYEE}, deliveryChan)
+			kc, err := external.NewKafkaConsumer(servers, groupId, topic.CONSUMER_TOPICS)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("cannot start kafka consumer", err)
 			}
 
-			go k.DeliveryReport()
-			go kafka.StartKafkaProcessor(database, servers, groupId, k)
-			rest.StartRestServer(database, authConn, k, restPort)
+			deliveryChan := make(chan ckafka.Event)
+			kp, err := external.NewKafkaProducer(servers, deliveryChan)
+			if err != nil {
+				log.Fatal("cannot start kafka producer", err)
+			}
+
+			go kp.DeliveryReport()
+			go kafka.StartKafkaServer(database, kc, kp)
+			rest.StartRestServer(database, authConn, kp, restPort)
 		},
 	}
 

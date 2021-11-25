@@ -5,20 +5,21 @@ import (
 	"fmt"
 
 	"github.com/c-4u/company-service/domain/entity"
+	"github.com/c-4u/company-service/domain/entity/filter"
 	"github.com/c-4u/company-service/infrastructure/db"
 	"github.com/c-4u/company-service/infrastructure/external"
 	ckafka "github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 type Repository struct {
-	P     *db.Postgres
-	Kafka *external.Kafka
+	P *db.Postgres
+	K *external.KafkaProducer
 }
 
-func NewRepository(postgres *db.Postgres, kafka *external.Kafka) *Repository {
+func NewRepository(postgres *db.Postgres, kafkaProducer *external.KafkaProducer) *Repository {
 	return &Repository{
-		P:     postgres,
-		Kafka: kafka,
+		P: postgres,
+		K: kafkaProducer,
 	}
 }
 
@@ -38,22 +39,22 @@ func (r *Repository) FindCompany(ctx context.Context, id string) (*entity.Compan
 	return &company, nil
 }
 
-func (r *Repository) SearchCompanies(ctx context.Context, filter *entity.Filter) (*string, []*entity.Company, error) {
+func (r *Repository) SearchCompanies(ctx context.Context, companyFilter *filter.CompanyFilter) (*string, []*entity.Company, error) {
 	var companies []*entity.Company
 
-	q := r.P.Db.Order("token desc").Limit(filter.PageSize)
+	q := r.P.Db.Order("token desc").Limit(companyFilter.PageSize)
 
-	if filter.CorporateName != "" {
-		q = q.Where("corporate_name = ?", filter.CorporateName)
+	if companyFilter.CorporateName != "" {
+		q = q.Where("corporate_name = ?", companyFilter.CorporateName)
 	}
-	if filter.TradeName != "" {
-		q = q.Where("trade_name = ?", filter.TradeName)
+	if companyFilter.TradeName != "" {
+		q = q.Where("trade_name = ?", companyFilter.TradeName)
 	}
-	if filter.Cnpj != "" {
-		q = q.Where("cnpj = ?", filter.Cnpj)
+	if companyFilter.Cnpj != "" {
+		q = q.Where("cnpj = ?", companyFilter.Cnpj)
 	}
-	if filter.PageToken != "" {
-		q = q.Where("token < ?", filter.PageToken)
+	if companyFilter.PageToken != "" {
+		q = q.Where("token < ?", companyFilter.PageToken)
 	}
 
 	err := q.Find(&companies).Error
@@ -63,7 +64,7 @@ func (r *Repository) SearchCompanies(ctx context.Context, filter *entity.Filter)
 
 	length := len(companies)
 	var nextPageToken string
-	if length == filter.PageSize {
+	if length == companyFilter.PageSize {
 		nextPageToken = *companies[length-1].Token
 	}
 
@@ -81,7 +82,7 @@ func (r *Repository) PublishEvent(ctx context.Context, msg, topic, key string) e
 		Value:          []byte(msg),
 		Key:            []byte(key),
 	}
-	err := r.Kafka.Producer.Produce(message, r.Kafka.DeliveryChan)
+	err := r.K.Producer.Produce(message, r.K.DeliveryChan)
 	if err != nil {
 		return err
 	}
@@ -106,5 +107,74 @@ func (r *Repository) FindEmployee(ctx context.Context, id string) (*entity.Emplo
 
 func (r *Repository) SaveEmployee(ctx context.Context, employee *entity.Employee) error {
 	err := r.P.Db.Save(employee).Error
+	return err
+}
+
+func (r *Repository) AddEmployeeToCompany(ctx context.Context, companyEmployee *entity.CompaniesEmployee) error {
+	err := r.P.Db.Create(companyEmployee).Error
+	return err
+}
+
+func (r *Repository) CreateWorkScale(ctx context.Context, workScale *entity.WorkScale) error {
+	err := r.P.Db.Create(workScale).Error
+	return err
+}
+
+func (r *Repository) FindWorkScale(ctx context.Context, companyID, workScaleID string) (*entity.WorkScale, error) {
+	var workScale entity.WorkScale
+	r.P.Db.Preload("Clocks").First(&workScale, "id = ? AND company_id = ?", workScaleID, companyID)
+
+	if workScale.ID == "" {
+		return nil, fmt.Errorf("no work scale found")
+	}
+
+	return &workScale, nil
+}
+
+func (r *Repository) SaveWorkScale(ctx context.Context, workScale *entity.WorkScale) error {
+	err := r.P.Db.Save(workScale).Error
+	return err
+}
+
+func (r *Repository) SearchWorkScales(ctx context.Context, workScaleFilter *filter.WorkScaleFilter) ([]*entity.WorkScale, error) {
+	var workScales []*entity.WorkScale
+
+	q := r.P.Db.Preload("Clocks").Where("company_id = ?", workScaleFilter.CompanyID)
+
+	if workScaleFilter.Name != "" {
+		q = q.Where("name = ?", workScaleFilter.Name)
+	}
+
+	err := q.Find(&workScales).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return workScales, nil
+}
+
+func (r *Repository) CreateClock(ctx context.Context, clock *entity.Clock) error {
+	err := r.P.Db.Create(clock).Error
+	return err
+}
+
+func (r *Repository) FindClock(ctx context.Context, workScaleID, clockID string) (*entity.Clock, error) {
+	var clock entity.Clock
+	r.P.Db.First(&clock, "id = ? AND work_scale_id = ?", clockID, workScaleID)
+
+	if clock.ID == "" {
+		return nil, fmt.Errorf("no clock found")
+	}
+
+	return &clock, nil
+}
+
+func (r *Repository) DeleteClock(ctx context.Context, workScaleID, clockID string) error {
+	err := r.P.Db.Where("id = ? AND work_scale_id = ?", clockID, workScaleID).Delete(entity.Clock{}).Error
+	return err
+}
+
+func (r *Repository) SaveClock(ctx context.Context, clock *entity.Clock) error {
+	err := r.P.Db.Save(clock).Error
 	return err
 }

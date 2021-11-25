@@ -1,4 +1,4 @@
-package entity
+package event
 
 import (
 	"encoding/json"

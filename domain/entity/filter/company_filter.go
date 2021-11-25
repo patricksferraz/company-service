@@ -1,4 +1,4 @@
-package entity
+package filter
 
 import (
 	"github.com/asaskevich/govalidator"
@@ -8,7 +8,7 @@ func init() {
 	govalidator.SetFieldsRequiredByDefault(true)
 }
 
-type Filter struct {
+type CompanyFilter struct {
 	CorporateName string `json:"corporate_name" valid:"optional"`
 	TradeName     string `json:"trade_name" valid:"optional"`
 	Cnpj          string `json:"cnpj" valid:"optional"`
@@ -16,18 +16,18 @@ type Filter struct {
 	PageToken     string `json:"page_token" valid:"optional"`
 }
 
-func (e *Filter) isValid() error {
+func (e *CompanyFilter) isValid() error {
 	_, err := govalidator.ValidateStruct(e)
 	return err
 }
 
-func NewFilter(corporateName, tradeName, cnpj string, pageSize int, pageToken string) (*Filter, error) {
+func NewCompanyFilter(corporateName, tradeName, cnpj string, pageSize int, pageToken string) (*CompanyFilter, error) {
 
 	if pageSize == 0 {
 		pageSize = 10
 	}
 
-	e := &Filter{
+	e := &CompanyFilter{
 		CorporateName: corporateName,
 		TradeName:     tradeName,
 		Cnpj:          cnpj,

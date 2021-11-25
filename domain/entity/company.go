@@ -20,11 +20,12 @@ func init() {
 
 type Company struct {
 	Base          `json:",inline" valid:"required"`
-	CorporateName string      `json:"corporate_name,omitempty" gorm:"column:corporate_name;type:varchar(255);not null" valid:"required"`
-	TradeName     string      `json:"trade_name,omitempty" gorm:"column:trade_name;type:varchar(255);not null" valid:"required"`
-	Cnpj          string      `json:"cnpj,omitempty" gorm:"column:cnpj;type:varchar(25);not null;unique" valid:"cnpj"`
-	Token         *string     `json:"-" gorm:"column:token;type:varchar(25);not null" valid:"-"`
-	Employees     []*Employee `json:"employees,omitempty" gorm:"many2many:companies_employess;References:id" valid:"-"`
+	CorporateName string       `json:"corporate_name,omitempty" gorm:"column:corporate_name;type:varchar(255);not null" valid:"required"`
+	TradeName     string       `json:"trade_name,omitempty" gorm:"column:trade_name;type:varchar(255);not null" valid:"required"`
+	Cnpj          string       `json:"cnpj,omitempty" gorm:"column:cnpj;type:varchar(25);not null;unique" valid:"cnpj"`
+	Token         *string      `json:"-" gorm:"column:token;type:varchar(25);not null" valid:"-"`
+	Employees     []*Employee  `json:"employees,omitempty" gorm:"many2many:companies_employees" valid:"-"`
+	WorkScales    []*WorkScale `json:"-" gorm:"ForeignKey:CompanyID" valid:"-"`
 }
 
 func NewCompany(corporateName, tradeName, cnpj string) (*Company, error) {

@@ -31,7 +31,7 @@ import (
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
-func StartRestServer(database *db.Postgres, authConn *grpc.ClientConn, kafka *external.Kafka, port int) {
+func StartRestServer(database *db.Postgres, authConn *grpc.ClientConn, kafkaProducer *external.KafkaProducer, port int) {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
@@ -46,7 +46,7 @@ func StartRestServer(database *db.Postgres, authConn *grpc.ClientConn, kafka *ex
 
 	authService := external.NewAuthClient(authConn)
 	authMiddlerare := NewAuthMiddleware(authService)
-	repository := repository.NewRepository(database, kafka)
+	repository := repository.NewRepository(database, kafkaProducer)
 	service := _service.NewService(repository)
 	restService := NewRestService(service)
 
@@ -57,9 +57,28 @@ func StartRestServer(database *db.Postgres, authConn *grpc.ClientConn, kafka *ex
 		{
 			authorized.POST("", restService.CreateCompany)
 			authorized.GET("", restService.SearchCompanies)
-			authorized.GET("/:id", restService.FindCompany)
-			authorized.PUT("/:id", restService.UpdateCompany)
-			authorized.POST("/:company_id/employee/:employee_id", restService.AddEmployeeToCompany)
+			authorized.GET("/:company_id", restService.FindCompany)
+			authorized.PUT("/:company_id", restService.UpdateCompany)
+
+			employees := authorized.Group("/:company_id/employees")
+			{
+				employees.POST("/:employee_id", restService.AddEmployeeToCompany)
+			}
+
+			workScales := authorized.Group("/:company_id/work-scales")
+			{
+				workScales.POST("", restService.CreateWorkScale)
+				workScales.GET("", restService.SearchWorkScales)
+				workScales.GET("/:work_scale_id", restService.FindWorkScale)
+
+				clocks := workScales.Group("/:work_scale_id/clocks")
+				{
+					clocks.POST("", restService.AddTimeToWorkScale)
+					clocks.GET("/:clock_id", restService.FindClock)
+					clocks.DELETE("/:clock_id", restService.DeleteClock)
+					clocks.PUT("/:clock_id", restService.UpdateClock)
+				}
+			}
 		}
 	}
 
