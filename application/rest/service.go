@@ -212,13 +212,14 @@ func (s *RestService) UpdateCompany(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param company_id path string true "Company ID"
-// @Param employee_id path string true "Employee ID"
+// @Param body body AddEmployeeToCompanyRequest true "JSON body to add employee to company\"
 // @Success 200 {object} HTTPResponse
 // @Failure 400 {object} HTTPError
 // @Failure 403 {object} HTTPError
-// @Router /companies/{company_id}/employees/{employee_id} [post]
+// @Router /companies/{company_id}/employees [post]
 func (s *RestService) AddEmployeeToCompany(ctx *gin.Context) {
-	var req AddEmployeeToCompanyRequest
+	var req AddEmployeeToCompanyIDRequest
+	var json AddEmployeeToCompanyRequest
 
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(
@@ -231,7 +232,18 @@ func (s *RestService) AddEmployeeToCompany(ctx *gin.Context) {
 		return
 	}
 
-	err := s.Service.AddEmployeeToCompany(ctx, req.CompanyID, req.EmployeeID)
+	if err := ctx.ShouldBindJSON(&json); err != nil {
+		ctx.JSON(
+			http.StatusBadRequest,
+			HTTPError{
+				Code:  http.StatusBadRequest,
+				Error: err.Error(),
+			},
+		)
+		return
+	}
+
+	err := s.Service.AddEmployeeToCompany(ctx, req.CompanyID, json.EmployeeID)
 	if err != nil {
 		ctx.JSON(
 			http.StatusForbidden,
@@ -602,4 +614,60 @@ func (s *RestService) UpdateClock(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, HTTPResponse{Code: http.StatusOK, Message: "updated successfully"})
+}
+
+// AddWorkScaleToEmployee godoc
+// @Security ApiKeyAuth
+// @Summary add work scale to employee
+// @Description Add work scale to employee
+// @ID addWorkScaleToEmployee
+// @Tags Company
+// @Accept json
+// @Produce json
+// @Param company_id path string true "Company ID"
+// @Param employee_id path string true "Employee ID"
+// @Param body body AddWorkScaleToEmployeeRequest true "JSON body to add work scale to employee"
+// @Success 200 {object} HTTPResponse
+// @Failure 400 {object} HTTPError
+// @Failure 403 {object} HTTPError
+// @Router /companies/{company_id}/employees/{employee_id}/work-scales [post]
+func (s *RestService) AddWorkScaleToEmployee(ctx *gin.Context) {
+	var req AddWorkScaleToEmployeeIDRequest
+	var json AddWorkScaleToEmployeeRequest
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(
+			http.StatusBadRequest,
+			HTTPError{
+				Code:  http.StatusBadRequest,
+				Error: err.Error(),
+			},
+		)
+		return
+	}
+
+	if err := ctx.ShouldBindJSON(&json); err != nil {
+		ctx.JSON(
+			http.StatusBadRequest,
+			HTTPError{
+				Code:  http.StatusBadRequest,
+				Error: err.Error(),
+			},
+		)
+		return
+	}
+
+	err := s.Service.AddWorkScaleToEmployee(ctx, req.CompanyID, req.EmployeeID, json.WorkScaleID)
+	if err != nil {
+		ctx.JSON(
+			http.StatusForbidden,
+			HTTPError{
+				Code:  http.StatusForbidden,
+				Error: err.Error(),
+			},
+		)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, HTTPResponse{Code: http.StatusOK, Message: "added successfully"})
 }

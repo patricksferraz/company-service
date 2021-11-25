@@ -62,7 +62,8 @@ func StartRestServer(database *db.Postgres, authConn *grpc.ClientConn, kafkaProd
 
 			employees := authorized.Group("/:company_id/employees")
 			{
-				employees.POST("/:employee_id", restService.AddEmployeeToCompany)
+				employees.POST("/", restService.AddEmployeeToCompany)
+				employees.POST("/:employee_id/work-scales", restService.AddWorkScaleToEmployee)
 			}
 
 			workScales := authorized.Group("/:company_id/work-scales")

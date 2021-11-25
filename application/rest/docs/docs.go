@@ -254,7 +254,7 @@ var doc = `{
                 }
             }
         },
-        "/companies/{company_id}/employees/{employee_id}": {
+        "/companies/{company_id}/employees": {
             "post": {
                 "security": [
                     {
@@ -282,11 +282,79 @@ var doc = `{
                         "required": true
                     },
                     {
+                        "description": "JSON body to add employee to company\\",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.AddEmployeeToCompanyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/rest.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{company_id}/employees/{employee_id}/work-scales": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add work scale to employee",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Company"
+                ],
+                "summary": "add work scale to employee",
+                "operationId": "addWorkScaleToEmployee",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "company_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "type": "string",
                         "description": "Employee ID",
                         "name": "employee_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "JSON body to add work scale to employee",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.AddWorkScaleToEmployeeRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -768,6 +836,28 @@ var doc = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.AddEmployeeToCompanyRequest": {
+            "type": "object",
+            "required": [
+                "employee_id"
+            ],
+            "properties": {
+                "employee_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.AddWorkScaleToEmployeeRequest": {
+            "type": "object",
+            "required": [
+                "work_scale_id"
+            ],
+            "properties": {
+                "work_scale_id": {
                     "type": "string"
                 }
             }

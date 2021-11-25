@@ -61,9 +61,12 @@ type UpdateCompanyRequest struct {
 	TradeName     string `json:"trade_name"`
 }
 
+type AddEmployeeToCompanyIDRequest struct {
+	CompanyID string `uri:"company_id" binding:"required,uuid"`
+}
+
 type AddEmployeeToCompanyRequest struct {
-	EmployeeID string `uri:"employee_id" binding:"required,uuid"`
-	CompanyID  string `uri:"company_id" binding:"required,uuid"`
+	EmployeeID string `json:"employee_id" binding:"required,uuid"`
 }
 
 type Clock struct {
@@ -145,4 +148,13 @@ type UpdateClockRequest struct {
 	Type     int    `json:"type"`
 	Clock    string `json:"clock"`
 	Timezone string `json:"timezone"`
+}
+
+type AddWorkScaleToEmployeeIDRequest struct {
+	CompanyID  string `uri:"company_id" binding:"required,uuid"`
+	EmployeeID string `uri:"employee_id" binding:"required,uuid"`
+}
+
+type AddWorkScaleToEmployeeRequest struct {
+	WorkScaleID string `json:"work_scale_id" binding:"required,uuid"`
 }
