@@ -1,5 +1,40 @@
 basePath: /api/v1
 definitions:
+  rest.AddClockToWorkScaleRequest:
+    properties:
+      clock:
+        type: string
+      timezone:
+        type: string
+      type:
+        type: integer
+    required:
+    - clock
+    - timezone
+    - type
+    type: object
+  rest.AddClockToWorkScaleResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  rest.Clock:
+    properties:
+      clock:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      timezone:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      work_scale_id:
+        type: string
+    type: object
   rest.Company:
     properties:
       cnpj:
@@ -33,6 +68,20 @@ definitions:
       id:
         type: string
     type: object
+  rest.CreateWorkScaleRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  rest.CreateWorkScaleResponse:
+    properties:
+      id:
+        type: string
+    type: object
   rest.HTTPError:
     properties:
       code:
@@ -60,11 +109,46 @@ definitions:
       next_page_token:
         type: string
     type: object
+  rest.SearchWorkScalesResponse:
+    properties:
+      work_scales:
+        items:
+          $ref: '#/definitions/rest.WorkScale'
+        type: array
+    type: object
+  rest.UpdateClockRequest:
+    properties:
+      clock:
+        type: string
+      timezone:
+        type: string
+      type:
+        type: integer
+    type: object
   rest.UpdateCompanyRequest:
     properties:
       corporate_name:
         type: string
       trade_name:
+        type: string
+    type: object
+  rest.WorkScale:
+    properties:
+      clocks:
+        items:
+          $ref: '#/definitions/rest.Clock'
+        type: array
+      company_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
         type: string
     type: object
 info:
@@ -106,9 +190,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/rest.SearchCompaniesResponse'
-            type: array
+            $ref: '#/definitions/rest.SearchCompaniesResponse'
         "400":
           description: Bad Request
           schema:
@@ -154,7 +236,76 @@ paths:
       summary: create a company
       tags:
       - Company
-  /companies/{company_id}/employee/{employee_id}:
+  /companies/{company_id}:
+    get:
+      consumes:
+      - application/json
+      description: Router for find a company
+      operationId: findCompany
+      parameters:
+      - description: Company ID
+        in: path
+        name: company_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Company'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: find a company
+      tags:
+      - Company
+    put:
+      consumes:
+      - application/json
+      description: Router for update a company
+      operationId: updateCompany
+      parameters:
+      - description: Company ID
+        in: path
+        name: company_id
+        required: true
+        type: string
+      - description: JSON body to update a new company
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/rest.UpdateCompanyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: update a Company
+      tags:
+      - Company
+  /companies/{company_id}/employees/{employee_id}:
     post:
       consumes:
       - application/json
@@ -191,17 +342,20 @@ paths:
       summary: add employee to company
       tags:
       - Company
-  /companies/{id}:
+  /companies/{company_id}/work-scales:
     get:
       consumes:
       - application/json
-      description: Router for find a company
-      operationId: findCompany
+      description: Search work scales by `filter`.
+      operationId: searchWorkScales
       parameters:
       - description: Company ID
         in: path
-        name: id
+        name: company_id
         required: true
+        type: string
+      - in: query
+        name: name
         type: string
       produces:
       - application/json
@@ -209,7 +363,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest.Company'
+            $ref: '#/definitions/rest.SearchWorkScalesResponse'
         "400":
           description: Bad Request
           schema:
@@ -220,26 +374,148 @@ paths:
             $ref: '#/definitions/rest.HTTPError'
       security:
       - ApiKeyAuth: []
-      summary: find a company
+      summary: search work scales by filter
       tags:
       - Company
-    put:
+    post:
       consumes:
       - application/json
-      description: Router for update a company
-      operationId: updateCompany
+      description: Create work scale
+      operationId: createWorkScale
       parameters:
       - description: Company ID
         in: path
-        name: id
+        name: company_id
         required: true
         type: string
-      - description: JSON body to update a new company
+      - description: JSON body to create a new work scale
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/rest.UpdateCompanyRequest'
+          $ref: '#/definitions/rest.CreateWorkScaleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.CreateWorkScaleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: create work scale
+      tags:
+      - Company
+  /companies/{company_id}/work-scales/{work_scale_id}:
+    get:
+      consumes:
+      - application/json
+      description: Router for find a work scale
+      operationId: findWorkScale
+      parameters:
+      - description: Company ID
+        in: path
+        name: company_id
+        required: true
+        type: string
+      - description: Work Scale ID
+        in: path
+        name: work_scale_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.WorkScale'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: find a work scale
+      tags:
+      - Company
+  /companies/{company_id}/work-scales/{work_scale_id}/clocks:
+    post:
+      consumes:
+      - application/json
+      description: Add clock to work scale
+      operationId: addClockToWorkScale
+      parameters:
+      - description: Company ID
+        in: path
+        name: company_id
+        required: true
+        type: string
+      - description: Work Scale ID
+        in: path
+        name: work_scale_id
+        required: true
+        type: string
+      - description: JSON body to add clock to work scale
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/rest.AddClockToWorkScaleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.AddClockToWorkScaleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: add clock to work scale
+      tags:
+      - Company
+  /companies/{company_id}/work-scales/{work_scale_id}/clocks/{clock_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Router for delete clock
+      operationId: deleteClock
+      parameters:
+      - description: Company ID
+        in: path
+        name: company_id
+        required: true
+        type: string
+      - description: Work Scale ID
+        in: path
+        name: work_scale_id
+        required: true
+        type: string
+      - description: Clock ID
+        in: path
+        name: clock_id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -257,7 +533,95 @@ paths:
             $ref: '#/definitions/rest.HTTPError'
       security:
       - ApiKeyAuth: []
-      summary: update a Company
+      summary: delete clock
+      tags:
+      - Company
+    get:
+      consumes:
+      - application/json
+      description: Find clock
+      operationId: findClock
+      parameters:
+      - description: Company ID
+        in: path
+        name: company_id
+        required: true
+        type: string
+      - description: Work Scale ID
+        in: path
+        name: work_scale_id
+        required: true
+        type: string
+      - description: Clock ID
+        in: path
+        name: clock_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Clock'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: find clock
+      tags:
+      - Company
+    put:
+      consumes:
+      - application/json
+      description: Router for update a clock
+      operationId: updateClock
+      parameters:
+      - description: Company ID
+        in: path
+        name: company_id
+        required: true
+        type: string
+      - description: Work Scale ID
+        in: path
+        name: work_scale_id
+        required: true
+        type: string
+      - description: Clock ID
+        in: path
+        name: clock_id
+        required: true
+        type: string
+      - description: JSON body to update a clock
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/rest.UpdateClockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: update a clock
       tags:
       - Company
 securityDefinitions:

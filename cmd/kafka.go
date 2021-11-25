@@ -54,12 +54,19 @@ func NewKafkaCmd() *cobra.Command {
 			}
 			defer database.Db.Close()
 
-			deliveryChan := make(chan ckafka.Event)
-			k, err := external.NewKafka(servers, groupId, []string{topic.NEW_EMPLOYEE}, deliveryChan)
+			kc, err := external.NewKafkaConsumer(servers, groupId, topic.CONSUMER_TOPICS)
 			if err != nil {
-				log.Fatal("cannot start kafka processor", err)
+				log.Fatal("cannot start kafka consumer", err)
 			}
-			kafka.StartKafkaProcessor(database, servers, groupId, k)
+
+			deliveryChan := make(chan ckafka.Event)
+			kp, err := external.NewKafkaProducer(servers, deliveryChan)
+			if err != nil {
+				log.Fatal("cannot start kafka producer", err)
+			}
+
+			go kp.DeliveryReport()
+			kafka.StartKafkaServer(database, kc, kp)
 		},
 	}
 

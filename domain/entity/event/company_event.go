@@ -1,18 +1,19 @@
-package entity
+package event
 
 import (
 	"encoding/json"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/c-4u/company-service/domain/entity"
 	uuid "github.com/satori/go.uuid"
 )
 
 type CompanyEvent struct {
-	ID      string   `json:"id,omitempty" valid:"uuid"`
-	Company *Company `json:"company,omitempty" valid:"-"`
+	ID      string          `json:"id,omitempty" valid:"uuid"`
+	Company *entity.Company `json:"company,omitempty" valid:"-"`
 }
 
-func NewCompanyEvent(company *Company) (*CompanyEvent, error) {
+func NewCompanyEvent(company *entity.Company) (*CompanyEvent, error) {
 	e := &CompanyEvent{
 		ID:      uuid.NewV4().String(),
 		Company: company,

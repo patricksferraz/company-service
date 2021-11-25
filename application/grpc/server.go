@@ -14,11 +14,11 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func StartGrpcServer(database *db.Postgres, authConn *grpc.ClientConn, kafka *external.Kafka, port int) {
+func StartGrpcServer(database *db.Postgres, authConn *grpc.ClientConn, kafkaProducer *external.KafkaProducer, port int) {
 
 	authClient := external.NewAuthClient(authConn)
 	interceptor := NewAuthInterceptor(authClient)
-	repository := repository.NewRepository(database, kafka)
+	repository := repository.NewRepository(database, kafkaProducer)
 	service := _service.NewService(repository)
 	grpcService := NewGrpcService(service)
 
