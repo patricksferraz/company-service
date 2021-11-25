@@ -178,3 +178,18 @@ func (r *Repository) SaveClock(ctx context.Context, clock *entity.Clock) error {
 	err := r.P.Db.Save(clock).Error
 	return err
 }
+
+func (r *Repository) FindCompanyEmployee(ctx context.Context, companyID, employeeID string) (*entity.CompaniesEmployee, error) {
+	var companyEmployee entity.CompaniesEmployee
+	r.P.Db.First(&companyEmployee, "company_id = ? AND employee_id = ?", companyID, employeeID)
+	if companyEmployee.CompanyID == "" {
+		return nil, fmt.Errorf("company-employee relationship not found")
+	}
+
+	return &companyEmployee, nil
+}
+
+func (r *Repository) SaveCompanyEmployee(ctx context.Context, companyEmployee *entity.CompaniesEmployee) error {
+	err := r.P.Db.Model(entity.CompaniesEmployee{}).Where("company_id = ? AND employee_id = ?", companyEmployee.CompanyID, companyEmployee.EmployeeID).Update("work_scale_id", companyEmployee.WorkScaleID).Error
+	return err
+}

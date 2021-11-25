@@ -20,6 +20,8 @@ type RepositoryInterface interface {
 	SaveEmployee(ctx context.Context, employee *entity.Employee) error
 
 	AddEmployeeToCompany(ctx context.Context, companyEmployee *entity.CompaniesEmployee) error
+	FindCompanyEmployee(ctx context.Context, companyID, employeeID string) (*entity.CompaniesEmployee, error)
+	SaveCompanyEmployee(ctx context.Context, companyEmployee *entity.CompaniesEmployee) error
 
 	CreateWorkScale(ctx context.Context, workScale *entity.WorkScale) error
 	FindWorkScale(ctx context.Context, companyID, workScaleID string) (*entity.WorkScale, error)

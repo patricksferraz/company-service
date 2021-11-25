@@ -18,6 +18,20 @@ definitions:
       id:
         type: string
     type: object
+  rest.AddEmployeeToCompanyRequest:
+    properties:
+      employee_id:
+        type: string
+    required:
+    - employee_id
+    type: object
+  rest.AddWorkScaleToEmployeeRequest:
+    properties:
+      work_scale_id:
+        type: string
+    required:
+    - work_scale_id
+    type: object
   rest.Clock:
     properties:
       clock:
@@ -305,7 +319,7 @@ paths:
       summary: update a Company
       tags:
       - Company
-  /companies/{company_id}/employees/{employee_id}:
+  /companies/{company_id}/employees:
     post:
       consumes:
       - application/json
@@ -317,11 +331,12 @@ paths:
         name: company_id
         required: true
         type: string
-      - description: Employee ID
-        in: path
-        name: employee_id
+      - description: JSON body to add employee to company\
+        in: body
+        name: body
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/rest.AddEmployeeToCompanyRequest'
       produces:
       - application/json
       responses:
@@ -340,6 +355,49 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: add employee to company
+      tags:
+      - Company
+  /companies/{company_id}/employees/{employee_id}/work-scales:
+    post:
+      consumes:
+      - application/json
+      description: Add work scale to employee
+      operationId: addWorkScaleToEmployee
+      parameters:
+      - description: Company ID
+        in: path
+        name: company_id
+        required: true
+        type: string
+      - description: Employee ID
+        in: path
+        name: employee_id
+        required: true
+        type: string
+      - description: JSON body to add work scale to employee
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/rest.AddWorkScaleToEmployeeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: add work scale to employee
       tags:
       - Company
   /companies/{company_id}/work-scales:

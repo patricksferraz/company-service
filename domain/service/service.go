@@ -239,7 +239,7 @@ func (s *Service) AddClockToWorkScale(ctx context.Context, clockType int, clock,
 		return nil, err
 	}
 
-	err = s.Repository.PublishEvent(ctx, string(msg), topic.NEW_CLOCK, workScale.ID)
+	err = s.Repository.PublishEvent(ctx, string(msg), topic.ADD_CLOCK_TO_WORK_SCALE, workScale.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -311,6 +311,45 @@ func (s *Service) UpdateClock(ctx context.Context, clockType int, clock, timezon
 	}
 
 	if err = s.Repository.PublishEvent(ctx, string(msg), topic.UPDATE_CLOCK, clockID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) AddWorkScaleToEmployee(ctx context.Context, companyID, employeeID, workScaleID string) error {
+	companyEmployee, err := s.Repository.FindCompanyEmployee(ctx, companyID, employeeID)
+	if err != nil {
+		return err
+	}
+
+	workScale, err := s.Repository.FindWorkScale(ctx, companyID, workScaleID)
+	if err != nil {
+		return err
+	}
+
+	err = companyEmployee.SetScale(workScale)
+	if err != nil {
+		return err
+	}
+
+	err = s.Repository.SaveCompanyEmployee(ctx, companyEmployee)
+	if err != nil {
+		return err
+	}
+
+	event, err := event.NewWorkScaleEmployeeEvent(companyID, employeeID, workScaleID)
+	if err != nil {
+		return err
+	}
+
+	msg, err := event.ToJson()
+	if err != nil {
+		return err
+	}
+
+	err = s.Repository.PublishEvent(ctx, string(msg), topic.ADD_WORK_SCALE_TO_EMPLOYEE, workScale.ID)
+	if err != nil {
 		return err
 	}
 
