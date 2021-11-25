@@ -46,6 +46,7 @@ func (e *ClockEvent) ToJson() ([]byte, error) {
 }
 
 type DeleteClockEvent struct {
+	ID          string `json:"id,omitempty" valid:"uuid"`
 	CompanyID   string `json:"company_id,omitempty" valid:"uuid"`
 	WorkScaleID string `json:"work_scale_id,omitempty" valid:"uuid"`
 	ClockID     string `json:"clock_id,omitempty" valid:"uuid"`
@@ -53,6 +54,7 @@ type DeleteClockEvent struct {
 
 func NewDeleteClockEvent(companyID, workScaleID, clockID string) (*DeleteClockEvent, error) {
 	e := &DeleteClockEvent{
+		ID:          uuid.NewV4().String(),
 		CompanyID:   companyID,
 		WorkScaleID: workScaleID,
 		ClockID:     clockID,
