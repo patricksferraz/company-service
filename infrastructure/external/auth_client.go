@@ -3,8 +3,8 @@ package external
 import (
 	"context"
 
-	"github.com/c-4u/company-service/domain/entity"
-	"github.com/c-4u/company-service/proto/pb"
+	"github.com/patricksferraz/company-service/domain/entity"
+	"github.com/patricksferraz/company-service/proto/pb"
 	"google.golang.org/grpc"
 )
 

@@ -3,8 +3,8 @@ package rest
 import (
 	"net/http"
 
-	"github.com/c-4u/company-service/domain/service"
 	"github.com/gin-gonic/gin"
+	"github.com/patricksferraz/company-service/domain/service"
 )
 
 type RestService struct {

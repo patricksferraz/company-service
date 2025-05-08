@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/c-4u/company-service/application/kafka/schema"
-	"github.com/c-4u/company-service/domain/service"
-	"github.com/c-4u/company-service/infrastructure/external"
-	"github.com/c-4u/company-service/infrastructure/external/topic"
 	ckafka "github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/patricksferraz/company-service/application/kafka/schema"
+	"github.com/patricksferraz/company-service/domain/service"
+	"github.com/patricksferraz/company-service/infrastructure/external"
+	"github.com/patricksferraz/company-service/infrastructure/external/topic"
 )
 
 type KafkaProcessor struct {

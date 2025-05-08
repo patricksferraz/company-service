@@ -3,8 +3,8 @@ package grpc
 import (
 	"context"
 
-	"github.com/c-4u/company-service/domain/service"
-	"github.com/c-4u/company-service/proto/pb"
+	"github.com/patricksferraz/company-service/domain/service"
+	"github.com/patricksferraz/company-service/proto/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"

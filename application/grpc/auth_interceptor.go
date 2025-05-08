@@ -3,8 +3,8 @@ package grpc
 import (
 	"context"
 
-	"github.com/c-4u/company-service/domain/entity"
-	"github.com/c-4u/company-service/infrastructure/external"
+	"github.com/patricksferraz/company-service/domain/entity"
+	"github.com/patricksferraz/company-service/infrastructure/external"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"

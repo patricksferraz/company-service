@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/c-4u/company-service/domain/entity"
+	"github.com/patricksferraz/company-service/domain/entity"
 	uuid "github.com/satori/go.uuid"
 )
 
